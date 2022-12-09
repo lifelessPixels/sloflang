@@ -1,0 +1,36 @@
+func my_function(x: i8, y: i8) -> u16? {
+    ensure x >= 0 && y >= 0 else {
+        return none;
+    }
+    return x + y;
+}
+
+func function_taking_reference_first_order_arg(value: ref i64, to_add: i64) {
+    value += to_add;
+}
+
+func my_fallible_function(string? message = none) fallible {
+    // the function is marked as fallible so if forced unwrap
+    // (! operator on message) fails, the error message from
+    // force unwrap operator of Optional<T> will be generated
+    println(f"message from main: \"{message!}\"");
+}
+
+func main(args: List<string>) fallible {
+    // testing my_function()
+    println(f"100 + 25 = {my_function(100, 25)}");
+
+    // testing function_taking_reference_first_order_arg()
+    let referenced: i64 = 0;
+    function_taking_reference_first_order_arg(referenced, 123);
+    ensure referenced == 123 else {
+        // NOTE: the function can also fail without specifing "reason", omitting "with ..." part of fail.
+        fail with Error(f"unexpected value of referenced, expected 123 got {referenced}");
+    }
+
+    // testing my_fallible_function()
+    for argument in args {
+        my_fallible_function(argument);
+    }
+    my_fallible_function(none);
+}
