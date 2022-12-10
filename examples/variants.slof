@@ -1,0 +1,50 @@
+// variant with simple subtypes, without any associated data
+variant KeywordType {
+    IfKeyword,
+    ElseKeyword,
+    ForKeyword
+}
+
+// variant with subtypes containing additional associated data
+// NOTE: if all subtypes contain field with the same name and type
+//       the "unmatched/raw" variant type can be questioned about it's 
+//       value - in this case all animals have string field `name` which
+//       means that it is possible to d things like this:
+// 
+//       let my_animal: Animal = get_animal();
+//       println(f"the animal's name is: {my_animal.name()}");
+//       
+variant Animal {
+    Dog(name: string),
+    Cat(name: string, fur_color: string),
+    Rabbit(name: string, age: i64)
+}
+
+// variant with subtypes of mixed variety - some with data, some without
+// NOTE: if couple of subtypes contain field with the same name and type
+//       they can be coupled into one `if let` or `match` branch like this:
+//       
+//       let my_fruit = get_fruit();
+//       match my_fruit {
+//           Pear(sweetness) | Berry(sweetness) {
+//               println(f"fruit has a sweetness of {sweetness}");
+//           }
+//           else {
+//               println("sweetness of the fruit is not known");
+//           }
+//       }
+//
+//       or in `if let`:
+//       
+//       // NOTE: in `if let` even multiple different variant types can be mixed with each other
+//       //       as long as all subtypes listed have field with same name and type
+//       if let Fruit.Pear(sweetness) | Fruit.Berry(sweetness) = my_fruit {
+//           println(f"fruit has sweetness of {sweetness}");
+//       }
+//
+variant Fruit {
+    Apple,
+    Pear(sweetness: u8),
+    Berry(type: string, sweetness: u8)
+}
+
