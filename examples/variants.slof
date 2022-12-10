@@ -9,7 +9,7 @@ variant KeywordType {
 // NOTE: if all subtypes contain field with the same name and type
 //       the "unmatched/raw" variant type can be questioned about it's 
 //       value - in this case all animals have string field `name` which
-//       means that it is possible to d things like this:
+//       means that it is possible to do things like this:
 // 
 //       let my_animal: Animal = get_animal();
 //       println(f"the animal's name is: {my_animal.name()}");
