@@ -16,6 +16,20 @@ class Point2D<T: Numeric> {
     }
 }
 
+// class can inherit from another class or classes by saying `extends ...` where
+// `...` is a comma-separated list of base classes
+// NOTE: if any conflicts occurs beetween classes from which class inherit/intefaces which class implements
+//       i.e. multiple fields with the same name, methods with incompatible types etc. the compiler error
+//       will be generated 
+class Point3D<T: Numeric> : Point2D<T> {
+    public z: T;
+
+    public init(this, x: T = 0; y: T = 0, z: T = 0) {
+        base(x, y);
+        this.z = z;
+    }
+}
+
 class Vector2D<T: Numeric> {
     public x_offset: T;
     public y_offset: T;
@@ -24,6 +38,20 @@ class Vector2D<T: Numeric> {
     public init(this, x: T = 0, y: T = 0) {
         this.x_offset = x;
         this.y_offset = y;
+    }
+}
+
+// methods of base class may be overriden by the derived class
+class TestClass {
+    public func do_something() {
+        println("i did something");
+    }
+}
+
+class DerivedClass : TestClass {
+    public override func do_something() {
+        print("i did something else, but also...");
+        base.do_something();
     }
 }
 
@@ -51,3 +79,53 @@ class DeferTester {
         return i64.from(to_convert)!;
     }
 }
+
+// interface declares functionality - for now only function declarations may be members of interface
+// class may implement functionality of an interface similarly to inheriting from a class
+interface Greeter {
+    // NOTE: all functions defined in interface are public by default
+    func greet(who: string) fallible;
+}
+
+class Object : Greeter {
+    public name: string;
+
+    public init(this, name: string) {
+        this.name = name;
+    }
+
+    public func greet(who: string) fallible {
+        if who == "John Doe" {
+            fail with Error(f"cannot greet {who}");
+        }
+        println(f"greetings, {who}!");
+    }
+}
+
+
+// `extend` block adds functionality to specified class, it is not inheritance by any means.
+//       for now extensions can only add new functions to the extended class
+extend DeferTester {
+    public func do_something() {
+        println("i did something");
+    }
+}
+
+// `extend ... by ...` block may be used to implement interface for specified class
+interface Car {
+    func start_engine() -> bool;
+    func stop_engine();
+}
+
+extend Object by Car {
+    public func start_engine() -> bool {
+        return false; // Object by no means can start it's engine
+    }
+
+    public func stop_engine() {}
+}
+
+// `alias ... = ...` can be used to name a type (it is not distinct!)
+alias Point2D<f64> = Point;
+alias Vector2D<f64> = Vector;
+alias i64 = TableIndex;
