@@ -37,9 +37,10 @@ func main(args: List<string>) fallible {
 
     // testing my_fallible_function()
     for argument in args {
-        my_fallible_function(argument);
+        my_fallible_function(argument)!;
     }
-    my_fallible_function(none);
+    let result = my_fallible_function(none);
+    ensure result.is_error();
 
     // testing DeferTester class
     let result = DeferTester.read_from_file("i_do_not_exist.txt");
@@ -54,4 +55,13 @@ func main(args: List<string>) fallible {
     ensure testing_list.length() == 0;
     // NOTE: should print message to stdout
     DeferTester.do_fallible_thing_and_inform_user_if_it_succeeds("123");
+
+    // testing Point2D and Vector2D classes
+    // NOTE: value like `1.0` by default will be f32
+    let my_float_point = Point2D(1.0, -2.0);
+    let my_float_vector = Vector2D(3.0, 0.0);
+    my_float_point.move_by(my_float_vector);
+    // FIXME: I'm not sure if this should be strict comparison on floats
+    ensure my_float_point.x == 4.0 and my_float_point.y == -2.0;
+
 }

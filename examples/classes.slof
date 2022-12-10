@@ -2,6 +2,14 @@ class Point2D<T: Numeric> {
     public x: T;
     public y: T;
 
+    // NOTE: initializer should take this if it is object initializer
+    //       if `this` is not provided, it means that it is a static
+    //       class initializer
+    public init(this, x: T = 0, y: T = 0) {
+        this.x = x;
+        this.y = y;
+    }
+
     public func move_by(this, vec: Vector2D<T>) {
         this.x += vec.x_offset;
         this.y += vec.y_offset;
@@ -11,6 +19,12 @@ class Point2D<T: Numeric> {
 class Vector2D<T: Numeric> {
     public x_offset: T;
     public y_offset: T;
+
+    // NOTE: initializers can also be fallible (this one is not)
+    public init(this, x: T = 0, y: T = 0) {
+        this.x_offset = x;
+        this.y_offset = y;
+    }
 }
 
 class DeferTester {
