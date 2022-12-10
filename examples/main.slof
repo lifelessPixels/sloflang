@@ -1,3 +1,5 @@
+from classes import *;
+
 func my_function(x: i8, y: i8) -> u16? {
     ensure x >= 0 && y >= 0 else {
         return none;
@@ -13,7 +15,12 @@ func my_fallible_function(string? message = none) fallible {
     // the function is marked as fallible so if forced unwrap
     // (! operator on message) fails, the error message from
     // force unwrap operator of Optional<T> will be generated
-    println(f"message from main: \"{message!}\"");
+    println(f"message from main: `{message!}`");
+}
+
+func my_function_taking_reference(list: List<string>) {
+    // FIXME: adding element to the list may fail possibly
+    list.add("Testing string, one, two, three");
 }
 
 func main(args: List<string>) fallible {
@@ -33,4 +40,18 @@ func main(args: List<string>) fallible {
         my_fallible_function(argument);
     }
     my_fallible_function(none);
+
+    // testing DeferTester class
+    let result = DeferTester.read_from_file("i_do_not_exist.txt");
+    ensure result.is_error() else {
+        fail with Error("unexpected success while reading from `i_do_not_exist.txt`");
+    }
+    DeferTester.do_fallible_thing_and_clear_list_if_it_fails("-12", testing_list);
+    // NOTE: using ensure without "else" block will just fail (if context is fallible) 
+    //       or crash the program (if context is infallible) 
+    ensure testing_list.length() == 4;
+    DeferTester.do_fallible_thing_and_clear_list_if_it_fails("test", testing_list);
+    ensure testing_list.length() == 0;
+    // NOTE: should print message to stdout
+    DeferTester.do_fallible_thing_and_inform_user_if_it_succeeds("123");
 }

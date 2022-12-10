@@ -1,0 +1,39 @@
+class Point2D<T: Numeric> {
+    public x: T;
+    public y: T;
+
+    public func move_by(this, vec: Vector2D<T>) {
+        this.x += vec.x_offset;
+        this.y += vec.y_offset;
+    }
+}
+
+class Vector2D<T: Numeric> {
+    public x_offset: T;
+    public y_offset: T;
+}
+
+class DeferTester {
+    public func read_from_file(path: FilePath, offset: usz = 0) fallible -> string {
+        let file_to_read = File.open(path, FileMode.ReadOnly | FileMode.Text)!;
+
+        // NOTE: "defer ..." means that the deferred statement will be executed at any point when the scope (in this case of the function)
+        //       will be exited (via return or fail) 
+        defer file_to_read.close();
+
+        file_to_read.seek(offset)!;
+        return file_to_read.read_all_text()!;
+    }
+
+    public func do_fallible_thing_and_clear_list_if_it_fails<T>(to_convert: string, to_clear: List<T>) fallible -> i64 {
+        // NOTE: "defer on fail ..." means that the deferred statement will only be executed if function fails
+        defer on fail to_clear.clear();
+        return i64.from(to_convert)!;
+    }
+    
+    public func do_fallible_thing_and_inform_user_if_it_succeeds(to_convert: string) fallible -> i64 {
+        // NOTE: "defer on success ..." means that the deferred statement will only be executed if function succeeds (does not fail, in other words)
+        defer on success println(f"yay, convertion of string `{to_convert}` to i64 was successful!");
+        return i64.from(to_convert)!;
+    }
+}
