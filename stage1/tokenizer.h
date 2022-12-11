@@ -6,7 +6,7 @@
 
 namespace slof {
 
-class Tokenizer : Stream<Token> {
+class Tokenizer : public Stream<Token> {
 public:
     explicit Tokenizer(const std::string& text_to_tokenize);
 
