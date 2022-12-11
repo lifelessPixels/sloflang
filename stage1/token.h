@@ -6,6 +6,7 @@
 #include <types.h>
 
 #define ENUMERATE_SLOF_TOKEN_TYPES \
+    TOKEN_ENUMERATOR(Identifier) \
     TOKEN_ENUMERATOR(Invalid)
 
 namespace slof  {
@@ -24,7 +25,7 @@ public:
     Token(TokenType type, literal_variant literal) : m_type(type), m_literal(literal) {}
     
     TokenType type() const { return m_type; }
-    bool has_literal() const { return m_literal.index() == 0; }
+    bool has_literal() const { return m_literal.index() != 0; }
     std::string stringify_literal() const;
 
     bool bool_literal() const { return std::get<bool>(m_literal); }
