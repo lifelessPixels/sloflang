@@ -6,7 +6,7 @@
 
 namespace slof  {
 
-enum class TokenType {
+enum class TokenType : u32 {
     Invalid
 };
 
