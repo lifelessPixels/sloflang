@@ -18,6 +18,11 @@ Utf8Stream::Utf8Stream(const std::string& string) {
             break;
         m_codepoints.push_back(*maybe_next_codepoint);
     }
+
+    if(!m_decoding_failed)
+        m_decoding_failed = current_position != string.length();
+    if(m_decoding_failed)
+        m_codepoints.clear();
 }
 
 bool Utf8Stream::eos() const {
@@ -70,16 +75,22 @@ std::optional<utf8_codepoint> Utf8Stream::get_next_codepoint(byte_getter get_nex
 
     if(number_of_additional_bytes > 0)
         number_of_additional_bytes -= 1;
-    if(number_of_additional_bytes > 5)
+    if(number_of_additional_bytes > 5) {
+        m_decoding_failed = true;
         return {}; // NOTE: this is an error, UTF-8 has maximum of 6 bytes
+    }
     
     for(u8 i = 0; i < number_of_additional_bytes; i++) {
         auto maybe_next_byte = get_next_byte();
-        if(!maybe_next_byte.has_value())
+        if(!maybe_next_byte.has_value()) {
+            m_decoding_failed = true;
             return {};
+        }
         auto next_byte = *maybe_next_byte;
-        if((next_byte & (1 << 7)) == 0 || (next_byte & (1 << 6)) != 0)
+        if((next_byte & (1 << 7)) == 0 || (next_byte & (1 << 6)) != 0) {
+            m_decoding_failed = true;
             return {};
+        }
         bytes[i + 1] = next_byte;
     }
 
@@ -96,27 +107,30 @@ std::optional<utf8_codepoint> Utf8Stream::decode_from_bytes(u8 bytes[], u8 count
              | (static_cast<utf8_codepoint>(bytes[1] & 0b00111111) << 0);
     if(count == 3)
         return (static_cast<utf8_codepoint>(bytes[0] & 0b00001111) << 12)
-             | (static_cast<utf8_codepoint>(bytes[1] & 0b00111111) << 6)    
+             | (static_cast<utf8_codepoint>(bytes[1] & 0b00111111) << 6)
              | (static_cast<utf8_codepoint>(bytes[2] & 0b00111111) << 0);
     if(count == 4)
         return (static_cast<utf8_codepoint>(bytes[0] & 0b00000111) << 18)
-             | (static_cast<utf8_codepoint>(bytes[1] & 0b00111111) << 12)    
-             | (static_cast<utf8_codepoint>(bytes[2] & 0b00111111) << 6)    
+             | (static_cast<utf8_codepoint>(bytes[1] & 0b00111111) << 12)
+             | (static_cast<utf8_codepoint>(bytes[2] & 0b00111111) << 6)
              | (static_cast<utf8_codepoint>(bytes[3] & 0b00111111) << 0);
     if(count == 5)
         return (static_cast<utf8_codepoint>(bytes[0] & 0b00000011) << 24)
-             | (static_cast<utf8_codepoint>(bytes[1] & 0b00111111) << 18)    
-             | (static_cast<utf8_codepoint>(bytes[2] & 0b00111111) << 12)    
-             | (static_cast<utf8_codepoint>(bytes[3] & 0b00111111) << 6)    
-             | (static_cast<utf8_codepoint>(bytes[4] & 0b00111111) << 0);    
+             | (static_cast<utf8_codepoint>(bytes[1] & 0b00111111) << 18)
+             | (static_cast<utf8_codepoint>(bytes[2] & 0b00111111) << 12)
+             | (static_cast<utf8_codepoint>(bytes[3] & 0b00111111) << 6)
+             | (static_cast<utf8_codepoint>(bytes[4] & 0b00111111) << 0);
     if(count == 6)
         return (static_cast<utf8_codepoint>(bytes[0] & 0b00000001) << 30)
-             | (static_cast<utf8_codepoint>(bytes[1] & 0b00111111) << 24)    
-             | (static_cast<utf8_codepoint>(bytes[2] & 0b00111111) << 18)    
-             | (static_cast<utf8_codepoint>(bytes[3] & 0b00111111) << 12)    
-             | (static_cast<utf8_codepoint>(bytes[4] & 0b00111111) << 6)    
-             | (static_cast<utf8_codepoint>(bytes[5] & 0b00111111) << 0);   
-    return 0; // NOTE: should never happen
+             | (static_cast<utf8_codepoint>(bytes[1] & 0b00111111) << 24)
+             | (static_cast<utf8_codepoint>(bytes[2] & 0b00111111) << 18)
+             | (static_cast<utf8_codepoint>(bytes[3] & 0b00111111) << 12)
+             | (static_cast<utf8_codepoint>(bytes[4] & 0b00111111) << 6)
+             | (static_cast<utf8_codepoint>(bytes[5] & 0b00111111) << 0);
+
+    // NOTE: should never happen
+    m_decoding_failed = true;
+    return 0; 
 }
 
 } // namespace slof

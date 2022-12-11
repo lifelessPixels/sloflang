@@ -13,6 +13,8 @@ class Utf8Stream : public Stream<utf8_codepoint> {
 public:
     explicit Utf8Stream(const std::string& string);
 
+    bool decoding_failed() const { return m_decoding_failed; }
+
     // ^Stream<Token>
     virtual bool eos() const override;
     virtual usz remaining_items() const override;
@@ -28,6 +30,7 @@ private:
     std::optional<utf8_codepoint> get_next_codepoint(byte_getter get_next_byte);
     std::optional<utf8_codepoint> decode_from_bytes(u8 bytes[], u8 count);
 
+    bool m_decoding_failed { false };
     std::vector<utf8_codepoint> m_codepoints {};
     usz m_stream_position { 0 };
 
