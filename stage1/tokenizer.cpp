@@ -3,7 +3,13 @@
 namespace slof {
 
 Tokenizer::Tokenizer(const std::string& text_to_tokenize) {
-    tokenize(text_to_tokenize);
+    Utf8Stream stream { text_to_tokenize };
+    if(stream.decoding_failed()) {
+        m_tokenization_failed = true;
+        return;
+    }
+    
+    tokenize(stream);
 }
 
 bool Tokenizer::eos() const {
@@ -40,7 +46,7 @@ std::optional<Token> Tokenizer::consume_if(element_predicate predicate) {
         return {};
 }
 
-void Tokenizer::tokenize(const std::string& input) {
+void Tokenizer::tokenize(Utf8Stream& input) {
     (void)(input);
     // TODO: implement tokenizer
 }
