@@ -1,0 +1,4 @@
+
+func main(args: List<string>) {
+    println("Hello, slof!");
+}
