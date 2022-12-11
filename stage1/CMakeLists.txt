@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(COMPILER_SOURCES
     compiler.cpp
+    token.cpp
 )
 
 set(BINARY_NAME sloflang)

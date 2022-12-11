@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <variant>
+#include <iostream>
 
 #include <types.h>
 
@@ -12,12 +13,14 @@ enum class TokenType : u32 {
 
 class Token {
 public:
-    using literal_variant = std::variant<bool, i64, f64, std::string>;
+    using literal_variant = std::variant<std::monostate, bool, i64, f64, std::string>;
 
     explicit Token(TokenType type) : m_type(type) {}
     Token(TokenType type, literal_variant literal) : m_type(type), m_literal(literal) {}
     
     TokenType type() const { return m_type; }
+    bool has_literal() const { return m_literal.index() == 0; }
+    std::string stringify_literal() const;
 
     bool bool_literal() const { return std::get<bool>(m_literal); }
     i64 integer_literal() const { return std::get<i64>(m_literal); }
@@ -29,5 +32,7 @@ private:
     literal_variant m_literal {};
 
 };
+
+std::ostream& operator<<(std::ostream&, const Token&);
 
 } // namespace slof
