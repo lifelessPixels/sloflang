@@ -6,6 +6,7 @@ set(COMPILER_SOURCES
     compiler.cpp
     token.cpp
     tokenizer.cpp
+    utf8stream.cpp
 )
 
 set(BINARY_NAME sloflang)
