@@ -1,3 +1,5 @@
+#include <ctype.h>
+
 #include <tokenizer.h>
 
 namespace slof {
@@ -36,9 +38,9 @@ std::optional<c8> Tokenizer::TextInput::consume_if(Stream::element_predicate pre
     return consume_unchecked();
 }
 
-Tokenizer::Tokenizer(const std::string& text_to_tokenize) {
-    TextInput input { text_to_tokenize };
-    tokenize(input);
+Tokenizer::Tokenizer(const std::string& text_to_tokenize) 
+    : m_input(text_to_tokenize) {
+    tokenize();
 }
 
 bool Tokenizer::eos() const {
@@ -75,10 +77,12 @@ std::optional<Token> Tokenizer::consume_if(element_predicate predicate) {
         return {};
 }
 
-void Tokenizer::tokenize(TextInput& input) {
-    while(!input.eos()) {
-
+void Tokenizer::tokenize() {
+    while(!m_input.eos()) {
+        auto& current = *m_input.peek();
     }
 }
+
+
 
 } // namespace slof

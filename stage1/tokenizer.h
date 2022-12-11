@@ -41,8 +41,9 @@ private:
 
     };
 
-    void tokenize(TextInput& input);
+    void tokenize();
 
+    TextInput m_input;
     bool m_tokenization_failed { false };
     std::vector<Token> m_tokens {};
     usz m_stream_position { 0 };
