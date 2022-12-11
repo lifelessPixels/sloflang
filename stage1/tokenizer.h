@@ -43,6 +43,8 @@ private:
 
     void tokenize();
 
+    Token consume_identifier();
+
     TextInput m_input;
     bool m_tokenization_failed { false };
     std::vector<Token> m_tokens {};

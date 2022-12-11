@@ -80,9 +80,31 @@ std::optional<Token> Tokenizer::consume_if(element_predicate predicate) {
 void Tokenizer::tokenize() {
     while(!m_input.eos()) {
         auto& current = *m_input.peek();
+
+        if(std::isspace(current)) {
+            m_input.consume_unchecked();
+        } else if(current == '_' || std::isalpha(current)) {
+            m_tokens.push_back(consume_identifier());
+        } else {
+            // FIXME: this is an error, but in the process of tokenizer
+            //        implementation it is useful to just skip unwanted
+            //        characters
+            m_input.consume_unchecked();
+        }
     }
 }
 
+Token Tokenizer::consume_identifier() {
+    std::string identifier {};
+    auto current = m_input.peek();
 
+    while(current != nullptr && (*current == '_' || std::isalnum(*current))) {
+        identifier += *current;
+        m_input.consume_unchecked();
+        current = m_input.peek();
+    }
+
+    return Token { TokenType::Identifier, std::move(identifier) };
+}
 
 } // namespace slof
