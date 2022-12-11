@@ -14,11 +14,20 @@ std::string Token::stringify_literal() const {
     }
 }
 
+std::string token_type_to_string(TokenType type) {
+    switch(type) {
+        #define TOKEN_ENUMERATOR(x) \
+            case TokenType::x:      \
+                return #x;
+        ENUMERATE_SLOF_TOKEN_TYPES
+        #undef TOKEN_ENUMERATOR
+        default:
+            return "<unknown token type>";
+    }
+}
+
 std::ostream& operator<<(std::ostream& stream, const Token& token) {
-    // NOTE: if we compiled the project with C++23 support, there would be std::to_underlying()
-    //       however it is very fresh standard so simple static_cast<u32>() will do the thing
-    // FIXME: stringify TokenType instead of using integer representing enum state
-    stream << "Token type=" << static_cast<u32>(token.type());
+    stream << "Token type=" << token_type_to_string(token.type());
     if(token.has_literal()) {
         stream << ", literal=" << token.stringify_literal();
     }

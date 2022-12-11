@@ -5,11 +5,16 @@
 
 #include <types.h>
 
+#define ENUMERATE_SLOF_TOKEN_TYPES \
+    TOKEN_ENUMERATOR(Invalid)
+
 namespace slof  {
 
+#define TOKEN_ENUMERATOR(x) x,
 enum class TokenType : u32 {
-    Invalid
+    ENUMERATE_SLOF_TOKEN_TYPES
 };
+#undef TOKEN_ENUMERATOR
 
 class Token {
 public:
@@ -33,6 +38,7 @@ private:
 
 };
 
+std::string token_type_to_string(TokenType type);
 std::ostream& operator<<(std::ostream&, const Token&);
 
 } // namespace slof
