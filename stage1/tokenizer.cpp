@@ -2,14 +2,43 @@
 
 namespace slof {
 
+Tokenizer::TextInput::TextInput(const std::string& string) : m_string(string) {}
+
+bool Tokenizer::TextInput::eos() const {
+    return m_stream_position == m_string.length();
+}
+
+usz Tokenizer::TextInput::remaining_items() const {
+    return m_string.length() - m_stream_position;
+}
+
+const c8* Tokenizer::TextInput::peek(usz offset) const {
+    if(offset >= remaining_items())
+        return nullptr;
+    return &m_string[m_stream_position + offset];
+}
+
+c8 Tokenizer::TextInput::consume_unchecked() {
+    return m_string[m_stream_position++];
+}
+
+std::optional<c8> Tokenizer::TextInput::consume() {
+    if(eos())
+        return {};
+    return consume_unchecked();
+}
+
+std::optional<c8> Tokenizer::TextInput::consume_if(Stream::element_predicate predicate) {
+    if(eos())
+        return {};
+    if(!predicate(*peek()))
+        return {};
+    return consume_unchecked();
+}
+
 Tokenizer::Tokenizer(const std::string& text_to_tokenize) {
-    Utf8Stream stream { text_to_tokenize };
-    if(stream.decoding_failed()) {
-        m_tokenization_failed = true;
-        return;
-    }
-    
-    tokenize(stream);
+    TextInput input { text_to_tokenize };
+    tokenize(input);
 }
 
 bool Tokenizer::eos() const {
@@ -46,9 +75,10 @@ std::optional<Token> Tokenizer::consume_if(element_predicate predicate) {
         return {};
 }
 
-void Tokenizer::tokenize(Utf8Stream& input) {
-    (void)(input);
-    // TODO: implement tokenizer
+void Tokenizer::tokenize(TextInput& input) {
+    while(!input.eos()) {
+
+    }
 }
 
 } // namespace slof

@@ -3,7 +3,6 @@
 
 #include <stream.h>
 #include <token.h>
-#include <utf8stream.h>
 
 namespace slof {
 
@@ -23,7 +22,26 @@ public:
     virtual std::optional<Token> consume_if(element_predicate predicate) override;
 
 private:
-    void tokenize(Utf8Stream& input);
+    class TextInput : public Stream<c8> {
+    public:
+        explicit TextInput(const std::string& string);
+
+        // ^Stream<c8>
+        virtual bool eos() const override;
+        virtual usz remaining_items() const override;
+
+        virtual const c8* peek(usz offset = 0) const override;
+        virtual c8 consume_unchecked() override;
+        virtual std::optional<c8> consume() override;
+        virtual std::optional<c8> consume_if(element_predicate predicate) override;
+
+    private:
+        const std::string& m_string;
+        usz m_stream_position { 0 };
+
+    };
+
+    void tokenize(TextInput& input);
 
     bool m_tokenization_failed { false };
     std::vector<Token> m_tokens {};

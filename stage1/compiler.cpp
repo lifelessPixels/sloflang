@@ -8,12 +8,6 @@ int main(int, char**) {
 
     slof::Token test_token(slof::TokenType::Invalid, true);
     std::cout << test_token << std::endl;
-
-    slof::Tokenizer tokenizer(
-        "func main(List<string> args) {   \n"
-        "    println(\"hello world!\");   \n"
-        "}                                \n"
-    );
-
+    
     return 0;
 }
