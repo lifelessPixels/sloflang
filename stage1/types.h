@@ -18,4 +18,6 @@ using f64 = double;
 using usz = u64;
 using isz = i64;
 
+using c8 = char;
+
 } // namespace slof
