@@ -43,7 +43,7 @@ private:
 
     void tokenize();
 
-    Token consume_identifier();
+    Token consume_identifier_or_keyword();
 
     TextInput m_input;
     bool m_tokenization_failed { false };

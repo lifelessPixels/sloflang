@@ -1,11 +1,19 @@
 #pragma once
 #include <string>
-#include <variant>
 #include <iostream>
+#include <variant>
+#include <unordered_map>
 
 #include <types.h>
 
+#define ENUMERATE_SLOF_KEYWORD_TOKEN_TYPES \
+    TOKEN_ENUMERATOR(IfKeyword) \
+    TOKEN_ENUMERATOR(ElseKeyword) \
+    TOKEN_ENUMERATOR(LetKeyword) \
+    TOKEN_ENUMERATOR(FuncKeyword)
+
 #define ENUMERATE_SLOF_TOKEN_TYPES \
+    ENUMERATE_SLOF_KEYWORD_TOKEN_TYPES \
     TOKEN_ENUMERATOR(Identifier) \
     TOKEN_ENUMERATOR(Invalid)
 
@@ -20,6 +28,8 @@ enum class TokenType : u32 {
 class Token {
 public:
     using literal_variant = std::variant<std::monostate, bool, i64, f64, std::string>;
+
+    static std::unordered_map<std::string, TokenType> s_keyword_literal_to_keyword_type;
 
     explicit Token(TokenType type) : m_type(type) {}
     Token(TokenType type, literal_variant literal) : m_type(type), m_literal(literal) {}

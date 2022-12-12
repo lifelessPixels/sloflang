@@ -1,6 +1,25 @@
+#include <algorithm>
+
 #include <token.h>
 
 namespace slof {
+
+static std::string string_to_lower(std::string string) {
+    auto to_lower = [](c8 c) { return (c >= 'A' && c <='Z') ? c + ('a' - 'A') : c; };
+    std::transform(string.begin(), string.end(), string.begin(), to_lower);
+    return string;
+}
+
+static std::string keyword_type_literal_to_keyword_literal(std::string keyword_type_literal) {
+    return string_to_lower(keyword_type_literal.substr(0, keyword_type_literal.find("Keyword")));
+}
+
+std::unordered_map<std::string, TokenType> Token::s_keyword_literal_to_keyword_type = {
+    #define TOKEN_ENUMERATOR(x) \
+        { keyword_type_literal_to_keyword_literal(#x), TokenType::x },
+    ENUMERATE_SLOF_KEYWORD_TOKEN_TYPES
+    #undef TOKEN_ENUMERATOR
+};
 
 std::string Token::stringify_literal() const {
     if(!has_literal())

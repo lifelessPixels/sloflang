@@ -84,7 +84,7 @@ void Tokenizer::tokenize() {
         if(std::isspace(current)) {
             m_input.consume_unchecked();
         } else if(current == '_' || std::isalpha(current)) {
-            m_tokens.push_back(consume_identifier());
+            m_tokens.push_back(consume_identifier_or_keyword());
         } else {
             // FIXME: this is an error, but in the process of tokenizer
             //        implementation it is useful to just skip unwanted
@@ -94,7 +94,7 @@ void Tokenizer::tokenize() {
     }
 }
 
-Token Tokenizer::consume_identifier() {
+Token Tokenizer::consume_identifier_or_keyword() {
     std::string identifier {};
     auto current = m_input.peek();
 
@@ -103,6 +103,9 @@ Token Tokenizer::consume_identifier() {
         m_input.consume_unchecked();
         current = m_input.peek();
     }
+
+    if(Token::s_keyword_literal_to_keyword_type.contains(identifier))
+        return Token { Token::s_keyword_literal_to_keyword_type.at(identifier) };
 
     return Token { TokenType::Identifier, std::move(identifier) };
 }
