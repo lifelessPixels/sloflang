@@ -26,7 +26,7 @@ std::string Token::stringify_literal() const {
         return "";
     switch(m_literal.index()) {
         case 1: return std::to_string(std::get<bool>(m_literal));
-        case 2: return std::to_string(std::get<i64>(m_literal));
+        case 2: return std::to_string(std::get<u64>(m_literal));
         case 3: return std::to_string(std::get<f64>(m_literal));
         case 4: return "\"" + std::get<std::string>(m_literal) + "\"";
         default: return "<invalid literal value>";

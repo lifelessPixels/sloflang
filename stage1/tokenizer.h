@@ -22,6 +22,8 @@ public:
     virtual std::optional<Token> consume_if(element_predicate predicate) override;
 
 private:
+    using consume_predicate = std::function<bool(c8)>;
+
     class TextInput : public Stream<c8> {
     public:
         explicit TextInput(const std::string& string);
@@ -43,7 +45,10 @@ private:
 
     void tokenize();
 
+    std::string consume_until(consume_predicate predicate);
+
     Token consume_identifier_or_keyword();
+    Token consume_number();
 
     TextInput m_input;
     bool m_tokenization_failed { false };

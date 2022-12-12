@@ -6,7 +6,7 @@
 int main(int, char**) {
     std::cout << "Hello slof!" << std::endl;
 
-    slof::Tokenizer tokenizer { "let else be if" };
+    slof::Tokenizer tokenizer { "let else be if 100 1.2345" };
 
     std::cout << "Token list: " << std::endl;
     while(!tokenizer.eos()) {

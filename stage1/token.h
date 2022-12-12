@@ -15,6 +15,8 @@
 #define ENUMERATE_SLOF_TOKEN_TYPES \
     ENUMERATE_SLOF_KEYWORD_TOKEN_TYPES \
     TOKEN_ENUMERATOR(Identifier) \
+    TOKEN_ENUMERATOR(IntegerLiteral) \
+    TOKEN_ENUMERATOR(FloatLiteral) \
     TOKEN_ENUMERATOR(Invalid)
 
 namespace slof  {
@@ -27,7 +29,7 @@ enum class TokenType : u32 {
 
 class Token {
 public:
-    using literal_variant = std::variant<std::monostate, bool, i64, f64, std::string>;
+    using literal_variant = std::variant<std::monostate, bool, u64, f64, std::string>;
 
     static std::unordered_map<std::string, TokenType> s_keyword_literal_to_keyword_type;
 
@@ -39,7 +41,7 @@ public:
     std::string stringify_literal() const;
 
     bool bool_literal() const { return std::get<bool>(m_literal); }
-    i64 integer_literal() const { return std::get<i64>(m_literal); }
+    u64 integer_literal() const { return std::get<u64>(m_literal); }
     f64 float_literal() const { return std::get<f64>(m_literal); }
     const std::string& string_literal() const { return std::get<std::string>(m_literal); }
 
