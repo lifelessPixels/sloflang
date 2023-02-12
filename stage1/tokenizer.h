@@ -1,32 +1,57 @@
 #pragma once
 #include <vector>
+#include <variant>
 
 #include <stream.h>
 #include <token.h>
 
 namespace slof {
 
-class Tokenizer : public Stream<Token> {
+class Tokenizer {
 public:
-    explicit Tokenizer(const std::string& text_to_tokenize);
+    class TokenStream : public Stream<Token> {
+    public:
+        explicit TokenStream(std::vector<Token> tokens) : m_tokens(std::move(tokens)) {}
 
-    bool tokenization_failed() const { return m_tokenization_failed; }
+        // ^Stream<Token>
+        virtual bool eos() const override;
+        virtual usz remaining_items() const override;
 
-    // ^Stream<Token>
-    virtual bool eos() const override;
-    virtual usz remaining_items() const override;
+        virtual const Token* peek(usz offset = 0) const override;
+        virtual Token consume_unchecked() override;
+        virtual std::optional<Token> consume() override;
+        virtual std::optional<Token> consume_if(element_predicate predicate) override;
 
-    virtual const Token* peek(usz offset = 0) const override;
-    virtual Token consume_unchecked() override;
-    virtual std::optional<Token> consume() override;
-    virtual std::optional<Token> consume_if(element_predicate predicate) override;
+    private:
+        std::vector<Token> m_tokens {};
+        usz m_stream_position { 0 };
+    };
+
+    // TODO: create a richer type for error reporting - string is kinda ok for now
+    class TokenizationResult {
+    public:
+        TokenizationResult(TokenStream stream) : m_result(std::move(stream)) {}
+        TokenizationResult(std::string error_message) : m_result(std::move(error_message)) {}
+
+        bool is_token_stream() const { return m_result.index() == 1; }
+        bool is_error() const { return m_result.index() == 2; }
+
+        const std::string& error_message() const { return std::get<std::string>(m_result); }
+        TokenStream& token_stream() { return std::get<TokenStream>(m_result); } 
+
+    private:
+        std::variant<std::monostate, TokenStream, std::string> m_result;
+
+    };
+
+    static TokenizationResult tokenize(std::string text_to_tokenize);
 
 private:
     using consume_predicate = std::function<bool(c8)>;
 
-    class TextInput : public Stream<c8> {
+    class InputStream : public Stream<c8> {
     public:
-        explicit TextInput(const std::string& string);
+        explicit InputStream(const std::string& string) : m_string(string) {};
 
         // ^Stream<c8>
         virtual bool eos() const override;
@@ -43,17 +68,10 @@ private:
 
     };
 
-    void tokenize();
+    static std::string consume_until(consume_predicate predicate, InputStream& input_stream);
 
-    std::string consume_until(consume_predicate predicate);
-
-    Token consume_identifier_or_keyword();
-    Token consume_number();
-
-    TextInput m_input;
-    bool m_tokenization_failed { false };
-    std::vector<Token> m_tokens {};
-    usz m_stream_position { 0 };
+    static Token consume_identifier_or_keyword(InputStream& input_stream);
+    static Token consume_number(InputStream& input_stream);
 
 };
 

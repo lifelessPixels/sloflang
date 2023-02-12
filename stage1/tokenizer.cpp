@@ -6,33 +6,31 @@
 
 namespace slof {
 
-Tokenizer::TextInput::TextInput(const std::string& string) : m_string(string) {}
-
-bool Tokenizer::TextInput::eos() const {
+bool Tokenizer::InputStream::eos() const {
     return m_stream_position == m_string.length();
 }
 
-usz Tokenizer::TextInput::remaining_items() const {
+usz Tokenizer::InputStream::remaining_items() const {
     return m_string.length() - m_stream_position;
 }
 
-const c8* Tokenizer::TextInput::peek(usz offset) const {
+const c8* Tokenizer::InputStream::peek(usz offset) const {
     if(offset >= remaining_items())
         return nullptr;
     return &m_string[m_stream_position + offset];
 }
 
-c8 Tokenizer::TextInput::consume_unchecked() {
+c8 Tokenizer::InputStream::consume_unchecked() {
     return m_string[m_stream_position++];
 }
 
-std::optional<c8> Tokenizer::TextInput::consume() {
+std::optional<c8> Tokenizer::InputStream::consume() {
     if(eos())
         return {};
     return consume_unchecked();
 }
 
-std::optional<c8> Tokenizer::TextInput::consume_if(Stream::element_predicate predicate) {
+std::optional<c8> Tokenizer::InputStream::consume_if(Stream::element_predicate predicate) {
     if(eos())
         return {};
     if(!predicate(*peek()))
@@ -40,36 +38,31 @@ std::optional<c8> Tokenizer::TextInput::consume_if(Stream::element_predicate pre
     return consume_unchecked();
 }
 
-Tokenizer::Tokenizer(const std::string& text_to_tokenize) 
-    : m_input(text_to_tokenize) {
-    tokenize();
-}
-
-bool Tokenizer::eos() const {
+bool Tokenizer::TokenStream::eos() const {
     return m_stream_position == m_tokens.size();
 }
 
-usz Tokenizer::remaining_items() const {
+usz Tokenizer::TokenStream::remaining_items() const {
     return m_tokens.size() - m_stream_position;
 }
 
-const Token* Tokenizer::peek(usz offset) const {
+const Token* Tokenizer::TokenStream::peek(usz offset) const {
     if(offset >= remaining_items())
         return nullptr;
     return &m_tokens[m_stream_position + offset];
 }
 
-Token Tokenizer::consume_unchecked() {
+Token Tokenizer::TokenStream::consume_unchecked() {
     return m_tokens[m_stream_position++];
 }
 
-std::optional<Token> Tokenizer::consume() {
+std::optional<Token> Tokenizer::TokenStream::consume() {
     if(eos())
         return {};
     return consume_unchecked();
 }
 
-std::optional<Token> Tokenizer::consume_if(element_predicate predicate) {
+std::optional<Token> Tokenizer::TokenStream::consume_if(element_predicate predicate) {
     if(eos())
         return {};
     auto const& token = *peek();
@@ -79,73 +72,84 @@ std::optional<Token> Tokenizer::consume_if(element_predicate predicate) {
         return {};
 }
 
-void Tokenizer::tokenize() {
-    while(!m_input.eos()) {
-        if(m_tokenization_failed)
-            break;
+Tokenizer::TokenizationResult Tokenizer::tokenize(std::string text_to_tokenize) {
+    InputStream input_stream { text_to_tokenize };
+    std::string error_message {};
+    std::vector<Token> result_tokens {};
 
-        auto& current = *m_input.peek();
+    while(!input_stream.eos()) {
+        auto& current = *input_stream.peek();
+
         if(std::isspace(current)) {
-            m_input.consume_unchecked();
+            input_stream.consume_unchecked();
         } else if(current == '_' || std::isalpha(current)) {
-            m_tokens.push_back(consume_identifier_or_keyword());
+            result_tokens.push_back(consume_identifier_or_keyword(input_stream));
         } else if(std::isdigit(current)) {
-            m_tokens.push_back(consume_number());
+            result_tokens.push_back(consume_number(input_stream));
         } else {
             // FIXME: this is an error, but in the process of tokenizer
             //        implementation it is useful to just skip unwanted
             //        characters
-            m_input.consume_unchecked();
+            input_stream.consume_unchecked();
+        }
+        
+        // check for invalid tokens - if such a tokern is pushed into the result
+        // it means that error occured and the tokenization should bail out
+        if(result_tokens.size() > 0) {
+            auto& last_token = result_tokens[result_tokens.size() - 1];
+            if(last_token.type() == TokenType::Invalid)
+                return last_token.string_literal();
         }
     }
+
+    return TokenStream(std::move(result_tokens));
 }
 
-std::string Tokenizer::consume_until(consume_predicate predicate) {
+std::string Tokenizer::consume_until(consume_predicate predicate, InputStream& input_stream) {
     std::string result {};
 
-    auto current = m_input.peek();
+    auto current = input_stream.peek();
     while(current != nullptr && predicate(*current)) {
         result += *current;
-        m_input.consume_unchecked();
-        current = m_input.peek();
+        input_stream.consume_unchecked();
+        current = input_stream.peek();
     }
 
     return result;
 }
 
-Token Tokenizer::consume_identifier_or_keyword() {
+Token Tokenizer::consume_identifier_or_keyword(InputStream& input_stream) {
     auto identifier_predicate = [](c8 character) { 
         return character == '_' || std::isalnum(character); 
     };
-    auto identifier = consume_until(identifier_predicate);
+    auto identifier = consume_until(identifier_predicate, input_stream);
 
     if(Token::s_keyword_literal_to_keyword_type.contains(identifier))
         return Token { Token::s_keyword_literal_to_keyword_type.at(identifier) };
     return Token { TokenType::Identifier, std::move(identifier) };
 }
 
-Token Tokenizer::consume_number() {
+Token Tokenizer::consume_number(InputStream& input_stream) {
     auto number_predicate = [](c8 character) { return std::isdigit(character); };
     // FIXME: if first_number_part is exactly 0 and next character is from set {b, o, x}
     //        it means non-decimal based literal and it should also be parsed 
-    auto first_number_part = consume_until(number_predicate);
+    auto first_number_part = consume_until(number_predicate, input_stream);
 
-    if(m_input.remaining_items() >= 2) {
-        auto maybe_dot = *m_input.peek();
-        auto maybe_digit = *m_input.peek(1);
+    if(input_stream.remaining_items() >= 2) {
+        auto maybe_dot = *input_stream.peek();
+        auto maybe_digit = *input_stream.peek(1);
 
         if(maybe_dot == '.' && std::isdigit(maybe_digit)) {
-            m_input.consume_unchecked(); // consume the dot
-            auto second_number_part = consume_until(number_predicate);
+            input_stream.consume_unchecked(); // consume the dot
+            auto second_number_part = consume_until(number_predicate, input_stream);
             auto combined_number = first_number_part + "." + second_number_part;
 
             try {
                 f64 float_number_value = std::stod(combined_number);
                 return Token { TokenType::FloatLiteral, float_number_value };
             } catch(const std::exception&) {
-                // FIXME: add proper error reporting
-                m_tokenization_failed = true;
-                return Token { TokenType::Invalid, std::move(combined_number) };
+                std::string error_message = "float literal '" + combined_number + "' could not be converted to float value";
+                return Token { TokenType::Invalid, std::move(error_message) };
             }
         }
     }
@@ -154,9 +158,8 @@ Token Tokenizer::consume_number() {
         u64 integer_number_value = std::stoull(first_number_part);
         return Token { TokenType::IntegerLiteral, integer_number_value };
     } catch(const std::exception&) {
-        // FIXME: add proper error reporting
-        m_tokenization_failed = true;
-        return Token { TokenType::Invalid, std::move(first_number_part) };
+        std::string error_message = "integral literal '" + first_number_part + "' could not be converted to integral value";
+        return Token { TokenType::Invalid, std::move(error_message) };
     }
 }
 
