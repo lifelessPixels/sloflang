@@ -10,13 +10,67 @@
     TOKEN_ENUMERATOR(IfKeyword) \
     TOKEN_ENUMERATOR(ElseKeyword) \
     TOKEN_ENUMERATOR(LetKeyword) \
-    TOKEN_ENUMERATOR(FuncKeyword)
+    TOKEN_ENUMERATOR(FuncKeyword) \
+    TOKEN_ENUMERATOR(NotKeyword) \
+    TOKEN_ENUMERATOR(AndKeyword) \
+    TOKEN_ENUMERATOR(OrKeyword)
+
+#define ENUMERATE_SLOF_SYMBOLIC_TOKEN_TYPES \
+    TOKEN_ENUMERATOR(Dot) \
+    TOKEN_ENUMERATOR(TwoDots) \
+    TOKEN_ENUMERATOR(TwoDotsEquals) \
+    TOKEN_ENUMERATOR(Comma) \
+    TOKEN_ENUMERATOR(Colon) \
+    TOKEN_ENUMERATOR(Semicolon) \
+    TOKEN_ENUMERATOR(LeftBracket) \
+    TOKEN_ENUMERATOR(RightBracket) \
+    TOKEN_ENUMERATOR(LeftSquareBracket) \
+    TOKEN_ENUMERATOR(RightSquareBracket) \
+    TOKEN_ENUMERATOR(LeftCurlyBracket) \
+    TOKEN_ENUMERATOR(RightCurlyBracket) \
+    TOKEN_ENUMERATOR(LessThan) \
+    TOKEN_ENUMERATOR(LessThanLessThan) \
+    TOKEN_ENUMERATOR(LessThanEquals) \
+    TOKEN_ENUMERATOR(LessThanLessThanEquals) \
+    TOKEN_ENUMERATOR(GreaterThan) \
+    TOKEN_ENUMERATOR(GreaterThanGreaterThan) \
+    TOKEN_ENUMERATOR(GreaterThanEquals) \
+    TOKEN_ENUMERATOR(GreaterThanGreaterThanEquals) \
+    TOKEN_ENUMERATOR(Equals) \
+    TOKEN_ENUMERATOR(EqualsEquals) \
+    TOKEN_ENUMERATOR(EqualsGreaterThan) \
+    TOKEN_ENUMERATOR(Plus) \
+    TOKEN_ENUMERATOR(PlusEquals) \
+    TOKEN_ENUMERATOR(Minus) \
+    TOKEN_ENUMERATOR(MinusEquals) \
+    TOKEN_ENUMERATOR(MinusGreaterThan) \
+    TOKEN_ENUMERATOR(Star) \
+    TOKEN_ENUMERATOR(StarStar) \
+    TOKEN_ENUMERATOR(StarEquals) \
+    TOKEN_ENUMERATOR(Slash) \
+    TOKEN_ENUMERATOR(SlashEquals) \
+    TOKEN_ENUMERATOR(Percent) \
+    TOKEN_ENUMERATOR(PercentEquals) \
+    TOKEN_ENUMERATOR(And) \
+    TOKEN_ENUMERATOR(AndEquals) \
+    TOKEN_ENUMERATOR(Pipe) \
+    TOKEN_ENUMERATOR(PipeEquals) \
+    TOKEN_ENUMERATOR(Caret) \
+    TOKEN_ENUMERATOR(CaretEquals) \
+    TOKEN_ENUMERATOR(ExclamationPoint) \
+    TOKEN_ENUMERATOR(ExclamationEquals) \
+    TOKEN_ENUMERATOR(QuestionMark) \
+    TOKEN_ENUMERATOR(QuestionMarkEquals) \
+    TOKEN_ENUMERATOR(QuestionMarkQuestionMark)
 
 #define ENUMERATE_SLOF_TOKEN_TYPES \
     ENUMERATE_SLOF_KEYWORD_TOKEN_TYPES \
+    ENUMERATE_SLOF_SYMBOLIC_TOKEN_TYPES \
+    TOKEN_ENUMERATOR(Comment) \
     TOKEN_ENUMERATOR(Identifier) \
     TOKEN_ENUMERATOR(IntegerLiteral) \
     TOKEN_ENUMERATOR(FloatLiteral) \
+    TOKEN_ENUMERATOR(StringLiteral) \
     TOKEN_ENUMERATOR(Invalid)
 
 namespace slof  {

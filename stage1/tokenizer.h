@@ -72,6 +72,8 @@ private:
 
     static Token consume_identifier_or_keyword(InputStream& input_stream);
     static Token consume_number(InputStream& input_stream);
+    static Token consume_string(InputStream& input_stream);
+    static Token consume_symbolic_token_or_comment(InputStream& input_stream);
 
 };
 
