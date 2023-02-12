@@ -7,13 +7,45 @@
 #include <types.h>
 
 #define ENUMERATE_SLOF_KEYWORD_TOKEN_TYPES \
+    TOKEN_ENUMERATOR(FuncKeyword) \
+    TOKEN_ENUMERATOR(ClassKeyword) \
+    TOKEN_ENUMERATOR(EnumKeyword) \
+    TOKEN_ENUMERATOR(InterfaceKeyword) \
+    TOKEN_ENUMERATOR(ExtensionKeyword) \
+    TOKEN_ENUMERATOR(ImplementationKeyword) \
+    TOKEN_ENUMERATOR(AliasKeyword) \
     TOKEN_ENUMERATOR(IfKeyword) \
     TOKEN_ENUMERATOR(ElseKeyword) \
+    TOKEN_ENUMERATOR(LoopKeyword) \
+    TOKEN_ENUMERATOR(WhileKeyword) \
+    TOKEN_ENUMERATOR(ForKeyword) \
+    TOKEN_ENUMERATOR(MatchKeyword) \
+    TOKEN_ENUMERATOR(DeferKeyword) \
+    TOKEN_ENUMERATOR(EnsureKeyword) \
     TOKEN_ENUMERATOR(LetKeyword) \
-    TOKEN_ENUMERATOR(FuncKeyword) \
+    TOKEN_ENUMERATOR(MutKeyword) \
+    TOKEN_ENUMERATOR(ThisKeyword) \
+    TOKEN_ENUMERATOR(IsKeyword) \
+    TOKEN_ENUMERATOR(InKeyword) \
+    TOKEN_ENUMERATOR(AsKeyword) \
+    TOKEN_ENUMERATOR(ByKeyword) \
+    TOKEN_ENUMERATOR(OfKeyword) \
     TOKEN_ENUMERATOR(NotKeyword) \
     TOKEN_ENUMERATOR(AndKeyword) \
-    TOKEN_ENUMERATOR(OrKeyword)
+    TOKEN_ENUMERATOR(OrKeyword) \
+    TOKEN_ENUMERATOR(OnKeyword) \
+    TOKEN_ENUMERATOR(RefKeyword) \
+    TOKEN_ENUMERATOR(ImportKeyword) \
+    TOKEN_ENUMERATOR(FromKeyword) \
+    TOKEN_ENUMERATOR(FallibleKeyword) \
+    TOKEN_ENUMERATOR(FailKeyword) \
+    TOKEN_ENUMERATOR(ReturnKeyword) \
+    TOKEN_ENUMERATOR(YieldKeyword) \
+    TOKEN_ENUMERATOR(SuccessKeyword) \
+    TOKEN_ENUMERATOR(PublicKeyword) \
+    TOKEN_ENUMERATOR(VirtualKeyword) \
+    TOKEN_ENUMERATOR(OverrideKeyword) \
+    TOKEN_ENUMERATOR(ExternKeyword)
 
 #define ENUMERATE_SLOF_SYMBOLIC_TOKEN_TYPES \
     TOKEN_ENUMERATOR(Dot) \

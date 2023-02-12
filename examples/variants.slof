@@ -1,26 +1,26 @@
-// variant with simple subtypes, without any associated data
-variant KeywordType {
+// enum with simple subtypes, without any associated data
+enum KeywordType {
     IfKeyword,
     ElseKeyword,
     ForKeyword
 }
 
-// variant with subtypes containing additional associated data
+// enum with subtypes containing additional associated data
 // NOTE: if all subtypes contain field with the same name and type
-//       the "unmatched/raw" variant type can be questioned about it's 
+//       the "unmatched/raw" enum type can be questioned about it's 
 //       value - in this case all animals have string field `name` which
 //       means that it is possible to do things like this:
 // 
 //       let my_animal: Animal = get_animal();
 //       println(f"the animal's name is: {my_animal.name}");
 //       
-variant Animal {
-    Dog(name: string),
-    Cat(name: string, fur_color: string),
-    Rabbit(name: string, age: i64)
+enum Animal {
+    Dog(name: String),
+    Cat(name: String, fur_color: String),
+    Rabbit(name: String, age: i64)
 }
 
-// variant with subtypes of mixed variety - some with data, some without
+// enum with subtypes of mixed variety - some with data, some without
 // NOTE: if couple of subtypes contain field with the same name and type
 //       they can be coupled into one `if let` or `match` branch like this:
 //       
@@ -42,9 +42,9 @@ variant Animal {
 //           println(f"fruit has sweetness of {sweetness}");
 //       }
 //
-variant Fruit {
+enum Fruit {
     Apple,
     Pear(sweetness: u8),
-    Berry(type: string, sweetness: u8)
+    Berry(type: String, sweetness: u8)
 }
 

@@ -1,26 +1,25 @@
 from classes import *;
 
 func my_function(x: i8, y: i8) -> u16? {
-    ensure x >= 0 && y >= 0 else {
+    ensure x >= 0 and y >= 0 else {
         return none;
     }
     return x + y;
 }
 
-func function_taking_reference_first_order_arg(value: ref i64, to_add: i64) {
+func function_taking_reference_first_order_arg(value: ref mut i64, to_add: i64) {
     value += to_add;
 }
 
-func my_fallible_function(string? message = none) fallible {
+func my_fallible_function(String? message = none) fallible {
     // the function is marked as fallible so if forced unwrap
     // (! operator on message) fails, the error message from
     // force unwrap operator of Optional<T> will be generated
     println(f"message from main: `{message!}`");
 }
 
-func my_function_taking_reference(list: List<string>) {
-    // FIXME: adding element to the list may fail possibly
-    list.add("Testing string, one, two, three");
+func my_function_taking_reference(list: mut List<string>) fallible {
+    list.add("Testing string, one, two, three")!;
 }
 
 func main(args: List<string>) fallible {
@@ -28,7 +27,7 @@ func main(args: List<string>) fallible {
     println(f"100 + 25 = {my_function(100, 25)}");
 
     // testing function_taking_reference_first_order_arg()
-    let referenced: i64 = 0;
+    mut referenced: i64 = 0;
     function_taking_reference_first_order_arg(referenced, 123);
     ensure referenced == 123 else {
         // NOTE: the function can also fail without specifing "reason", omitting "with ..." part of fail.
@@ -40,13 +39,15 @@ func main(args: List<string>) fallible {
         my_fallible_function(argument)!;
     }
     let result = my_fallible_function(none);
-    ensure result.is_error();
+    ensure result.has_failed();
 
     // testing DeferTester class
     let result = DeferTester.read_from_file("i_do_not_exist.txt");
-    ensure result.is_error() else {
+    ensure result.has_failed() else {
         fail with Error("unexpected success while reading from `i_do_not_exist.txt`");
     }
+
+    mut testing_list: List<i32> = [1, 2, 3, 4];
     DeferTester.do_fallible_thing_and_clear_list_if_it_fails("-12", testing_list);
     // NOTE: using ensure without "else" block will just fail (if context is fallible) 
     //       or crash the program (if context is infallible) 
@@ -58,10 +59,9 @@ func main(args: List<string>) fallible {
 
     // testing Point2D and Vector2D classes
     // NOTE: value like `1.0` by default will be f32
-    let my_float_point = Point2D(1.0, -2.0);
+    mut my_float_point = Point2D(1.0, -2.0);
     let my_float_vector = Vector2D(3.0, 0.0);
     my_float_point.move_by(my_float_vector);
-    // FIXME: I'm not sure if this should be strict comparison on floats
     ensure my_float_point.x == 4.0 and my_float_point.y == -2.0;
 
 }
